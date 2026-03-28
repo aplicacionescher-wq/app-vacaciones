@@ -1,40 +1,53 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import { 
   getFirestore, collection, addDoc, getDocs, updateDoc, doc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 import { 
   getAuth, signInWithEmailAndPassword, onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// CONFIG (REEMPLAZA CON LA TUYA)
+
+// 🔥 TU CONFIG (YA CORRECTA)
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_DOMINIO",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_BUCKET",
-  messagingSenderId: "TU_ID",
-  appId: "TU_APP_ID"
+  apiKey: "AIzaSyCrFSplvyoXZy_mgkVzG7e1VuPCPXM3gcs",
+  authDomain: "vacaciones-app-7353a.firebaseapp.com",
+  projectId: "vacaciones-app-7353a",
+  storageBucket: "vacaciones-app-7353a.firebasestorage.app",
+  messagingSenderId: "829112426227",
+  appId: "1:829112426227:web:064a78429796e888d9a186"
 };
 
-// INIT
+
+// 🔥 INICIALIZAR
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// LOGIN
-window.login = async () => {
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
+console.log("🔥 Firebase conectado correctamente");
 
-  await signInWithEmailAndPassword(auth, email, pass);
+
+// 🔐 LOGIN
+window.login = async () => {
+  try {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
+
+    await signInWithEmailAndPassword(auth, email, pass);
+
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
 };
 
-// DETECTAR USUARIO
+
+// 👤 DETECTAR USUARIO
 onAuthStateChanged(auth, user => {
   if (user) {
     document.getElementById("login").style.display = "none";
 
-    // ADMIN
     if (user.email === "admin@empresa.com") {
       document.getElementById("adminPanel").style.display = "block";
       cargarAdmin({ estado: "pendiente" });
@@ -44,9 +57,10 @@ onAuthStateChanged(auth, user => {
   }
 });
 
-// ENVIAR SOLICITUD
+
+// 📩 ENVIAR SOLICITUD
 window.enviarSolicitud = async () => {
-  const data = {
+  await addDoc(collection(db, "vacaciones"), {
     nombre: document.getElementById("nombre").value,
     usuario: auth.currentUser.email,
     inicio: document.getElementById("inicio").value,
@@ -54,19 +68,17 @@ window.enviarSolicitud = async () => {
     periodo: document.getElementById("periodo").value,
     area: document.getElementById("area").value,
     estado: "en proceso"
-  };
-
-  await addDoc(collection(db, "vacaciones"), data);
+  });
 
   alert("Solicitud enviada");
 };
 
-// CARGAR ADMIN
+
+// 📊 CARGAR ADMIN
 async function cargarAdmin(filtros = {}) {
   const cont = document.getElementById("solicitudes");
   cont.innerHTML = "";
 
-  // HEADER
   cont.innerHTML = `
     <div class="fila header">
       <div>Nombre</div>
@@ -84,14 +96,12 @@ async function cargarAdmin(filtros = {}) {
   data.forEach(d => {
     const v = d.data();
 
-    // FILTRO ESTADO
     if (filtros.estado && filtros.estado !== "todas") {
       if (filtros.estado === "pendiente" && v.estado !== "en proceso") return;
       if (filtros.estado === "aprobada" && v.estado !== "aprobada") return;
       if (filtros.estado === "cancelada" && v.estado !== "cancelada") return;
     }
 
-    // FILTRO FECHAS
     if (filtros.inicio && v.inicio < filtros.inicio) return;
     if (filtros.fin && v.fin > filtros.fin) return;
 
@@ -115,31 +125,30 @@ async function cargarAdmin(filtros = {}) {
   });
 }
 
-// FILTROS
+
+// 🎛️ FILTROS
 window.aplicarFiltros = () => {
   const inicio = document.getElementById("filtroInicio").value;
   const fin = document.getElementById("filtroFin").value;
   const estado = document.getElementById("filtroEstado").value;
 
-  cargarAdmin({
-    inicio,
-    fin,
-    estado
-  });
+  cargarAdmin({ inicio, fin, estado });
 };
 
-// APROBAR
+
+// ✅ APROBAR
 window.autorizar = async (id) => {
   await updateDoc(doc(db, "vacaciones", id), {
     estado: "aprobada"
   });
-  cargarAdmin();
+  aplicarFiltros();
 };
 
-// CANCELAR
+
+// ❌ CANCELAR
 window.cancelar = async (id) => {
   await updateDoc(doc(db, "vacaciones", id), {
     estado: "cancelada"
   });
-  cargarAdmin();
+  aplicarFiltros();
 };
