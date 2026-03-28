@@ -1,4 +1,4 @@
-// 🔥 IMPORTS FIREBASE
+// 🔥 FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
@@ -7,10 +7,18 @@ import {
   addDoc,
   getDocs,
   doc,
-  updateDoc
+  updateDoc,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔐 CONFIG
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyCrFSplvyoXZy_mgkVzG7e1VuPCPXM3gcs",
   authDomain: "vacaciones-app-7353a.firebaseapp.com",
@@ -20,28 +28,38 @@ const firebaseConfig = {
   appId: "1:829112426227:web:064a78429796e888d9a186"
 };
 
-// 🚀 INICIALIZAR
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-// VARIABLE GLOBAL
-let rolActual = "";
+// LOGIN REAL 🔐
+window.login = async () => {
+  const email = document.getElementById("usuario").value;
+  const pass = prompt("Contraseña:");
 
-// LOGIN
-window.login = () => {
-  const usuario = document.getElementById("usuario").value;
-  rolActual = document.getElementById("rol").value;
-
-  if (!usuario) {
-    alert("Ingresa un usuario");
-    return;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (error) {
+    alert("Error de login");
   }
+};
 
+// DETECTAR SESIÓN
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    iniciarApp(user);
+  }
+});
+
+// INICIAR APP
+function iniciarApp(user) {
   document.getElementById("login").style.display = "none";
   document.getElementById("app").style.display = "block";
 
-  if (rolActual === "admin") {
-    document.getElementById("titulo").innerText = "Panel Administrador";
+  const esAdmin = user.email === "admin@empresa.com";
+
+  if (esAdmin) {
+    document.getElementById("titulo").innerText = "Administrador";
     document.getElementById("empleadoPanel").style.display = "none";
     document.getElementById("adminPanel").style.display = "block";
     cargarAdmin();
@@ -49,42 +67,34 @@ window.login = () => {
     document.getElementById("titulo").innerText = "Empleado";
     document.getElementById("adminPanel").style.display = "none";
     document.getElementById("empleadoPanel").style.display = "block";
-    cargarSolicitudes();
+    cargarSolicitudes(user.email);
   }
-};
+}
 
 // ENVIAR SOLICITUD
 window.enviarSolicitud = async () => {
-  const nombre = document.getElementById("nombre").value;
-  const inicio = document.getElementById("inicio").value;
-  const fin = document.getElementById("fin").value;
-  const periodo = document.getElementById("periodo").value;
-  const area = document.getElementById("area").value;
-
-  if (!nombre || !inicio || !fin) {
-    alert("Completa todos los campos");
-    return;
-  }
+  const user = auth.currentUser;
 
   await addDoc(collection(db, "vacaciones"), {
-    nombre,
-    inicio,
-    fin,
-    periodo,
-    area,
+    usuario: user.email,
+    nombre: document.getElementById("nombre").value,
+    inicio: document.getElementById("inicio").value,
+    fin: document.getElementById("fin").value,
+    area: document.getElementById("area").value,
     estado: "en proceso"
   });
 
   alert("Solicitud enviada");
-  cargarSolicitudes();
+  cargarSolicitudes(user.email);
 };
 
-// EMPLEADO VE SUS SOLICITUDES
-async function cargarSolicitudes() {
+// EMPLEADO SOLO VE LO SUYO
+async function cargarSolicitudes(email) {
   const lista = document.getElementById("lista");
   lista.innerHTML = "";
 
-  const data = await getDocs(collection(db, "vacaciones"));
+  const q = query(collection(db, "vacaciones"), where("usuario", "==", email));
+  const data = await getDocs(q);
 
   data.forEach(d => {
     const v = d.data();
@@ -103,10 +113,9 @@ async function cargarAdmin() {
     const v = d.data();
 
     cont.innerHTML += `
-      <div style="border:1px solid white; margin:10px; padding:10px;">
-        <p><b>${v.nombre}</b></p>
-        <p>${v.inicio} a ${v.fin}</p>
-        <p>${v.area}</p>
+      <div>
+        <p>${v.usuario}</p>
+        <p>${v.inicio} - ${v.fin}</p>
         <p>${v.estado}</p>
         <button onclick="autorizar('${d.id}')">Autorizar</button>
         <button onclick="cancelar('${d.id}')">Cancelar</button>
@@ -115,17 +124,13 @@ async function cargarAdmin() {
   });
 }
 
-// ACCIONES ADMIN
+// ADMIN ACCIONES
 window.autorizar = async (id) => {
-  await updateDoc(doc(db, "vacaciones", id), {
-    estado: "aprobada"
-  });
+  await updateDoc(doc(db, "vacaciones", id), { estado: "aprobada" });
   cargarAdmin();
 };
 
 window.cancelar = async (id) => {
-  await updateDoc(doc(db, "vacaciones", id), {
-    estado: "cancelada"
-  });
+  await updateDoc(doc(db, "vacaciones", id), { estado: "cancelada" });
   cargarAdmin();
 };
