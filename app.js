@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -15,7 +16,7 @@ import {
   doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// CONFIG
+// CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyCrFSplvyoXZy_mgkVzG7e1VuPCPXM3gcs",
   authDomain: "vacaciones-app-7353a.firebaseapp.com",
@@ -29,14 +30,13 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let rolActual = "empleado";
+// 🔐 ROLES AUTOMÁTICOS
+const admins = ["admin@empresa.com"];
 
 // LOGIN
 window.login = async () => {
   const email = document.getElementById("correo").value;
   const pass = document.getElementById("password").value;
-
-  rolActual = document.getElementById("rol").value;
 
   await signInWithEmailAndPassword(auth, email, pass);
 };
@@ -47,12 +47,12 @@ window.logout = async () => {
   location.reload();
 };
 
-// CONTROL DE SESIÓN
+// SESIÓN
 onAuthStateChanged(auth, user => {
   if (user) {
     document.getElementById("login").style.display = "none";
 
-    if (rolActual === "admin") {
+    if (admins.includes(user.email)) {
       document.getElementById("adminPanel").style.display = "block";
       cargarSolicitudes();
     } else {
@@ -79,32 +79,33 @@ window.enviarSolicitud = async () => {
   cargarMisSolicitudes();
 };
 
-// VER MIS SOLICITUDES
+// EMPLEADO
 async function cargarMisSolicitudes() {
   const cont = document.getElementById("misSolicitudes");
   cont.innerHTML = "";
-
-  const user = auth.currentUser;
 
   const data = await getDocs(collection(db, "vacaciones"));
 
   data.forEach(d => {
     const v = d.data();
 
-    if (v.usuario !== user.email) return;
+    if (v.usuario !== auth.currentUser.email) return;
 
-    let mensaje = "";
+    let clase = "pendiente";
+    let mensaje = "⏳ Pendiente";
 
     if (v.estado === "aprobada") {
+      clase = "aprobada";
       mensaje = "✅ Aprobada";
-    } else if (v.estado === "cancelada") {
+    }
+
+    if (v.estado === "cancelada") {
+      clase = "cancelada";
       mensaje = "❌ Cancelada";
-    } else {
-      mensaje = "⏳ Pendiente";
     }
 
     cont.innerHTML += `
-      <div class="fila">
+      <div class="fila ${clase}">
         <div>${v.inicio}</div>
         <div>${v.fin}</div>
         <div>${v.periodo}</div>
@@ -115,7 +116,7 @@ async function cargarMisSolicitudes() {
   });
 }
 
-// ADMIN VER SOLICITUDES
+// ADMIN
 window.cargarSolicitudes = async () => {
   const cont = document.getElementById("solicitudes");
   cont.innerHTML = "";
@@ -133,8 +134,12 @@ window.cargarSolicitudes = async () => {
     if (inicioFiltro && v.inicio < inicioFiltro) return;
     if (finFiltro && v.fin > finFiltro) return;
 
+    let clase = "pendiente";
+    if (v.estado === "aprobada") clase = "aprobada";
+    if (v.estado === "cancelada") clase = "cancelada";
+
     cont.innerHTML += `
-      <div class="fila">
+      <div class="fila ${clase}">
         <div>${v.nombre}</div>
         <div>${v.usuario}</div>
         <div>${v.inicio}</div>
