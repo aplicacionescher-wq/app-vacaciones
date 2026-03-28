@@ -1,60 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>FASTHCK Vacaciones</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Vacaciones Empresa</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>FASTHCK Vacaciones</h1>
+  <h1>Solicitud de Vacaciones</h1>
 
-<!-- LOGIN -->
-<div id="login">
-  <input type="email" id="usuario" placeholder="Correo">
-  <button onclick="login()">Entrar</button>
-</div>
+  <!-- LOGIN -->
+  <div id="login">
+    <input type="email" id="email" placeholder="Correo">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="login()">Ingresar</button>
+  </div>
 
-<!-- APP -->
-<div id="app" style="display:none;">
-
-  <button id="logoutBtn" onclick="logout()">Cerrar sesión</button>
-
-  <h2 id="titulo"></h2>
-
-  <!-- EMPLEADO -->
-  <div id="empleadoPanel">
-    <input type="text" id="nombre" placeholder="Nombre">
+  <!-- FORMULARIO -->
+  <div id="formulario" style="display:none;">
+    <input type="text" id="nombre" placeholder="Nombre completo">
     <input type="date" id="inicio">
     <input type="date" id="fin">
-
-    <!-- NUEVO -->
-    <select id="periodo">
-      <option value="Primer periodo">Primer periodo</option>
-      <option value="Segundo periodo">Segundo periodo</option>
-    </select>
-
+    <input type="text" id="periodo" placeholder="Periodo (ej. 2025)">
     <input type="text" id="area" placeholder="Área">
 
     <button onclick="enviarSolicitud()">Enviar solicitud</button>
-
-    <ul id="lista"></ul>
   </div>
 
   <!-- ADMIN -->
   <div id="adminPanel" style="display:none;">
 
-    <!-- FILTRO POR FECHAS -->
-    <h3>Filtrar por fechas</h3>
+    <h2>Panel Administrador</h2>
+
+    <h3>Filtros</h3>
+
     <input type="date" id="filtroInicio">
     <input type="date" id="filtroFin">
-    <button onclick="filtrarPorFecha()">Filtrar</button>
+
+    <select id="filtroEstado">
+      <option value="pendiente">Pendientes</option>
+      <option value="todas">Todas</option>
+      <option value="aprobada">Aprobadas</option>
+      <option value="cancelada">Canceladas</option>
+    </select>
+
+    <button onclick="aplicarFiltros()">Aplicar filtros</button>
 
     <div id="solicitudes"></div>
+
   </div>
 
-</div>
+  <script type="module" src="app.js"></script>
 
-<script type="module" src="app.js"></script>
 </body>
 </html>
