@@ -9,15 +9,9 @@
 
 <!-- LOGIN -->
 <div id="login">
-  <h2>Login</h2>
+  <h2>Iniciar sesión</h2>
   <input type="email" id="correo" placeholder="Correo">
   <input type="password" id="password" placeholder="Contraseña">
-
-  <select id="rol">
-    <option value="empleado">Empleado</option>
-    <option value="admin">Administrador</option>
-  </select>
-
   <button onclick="login()">Ingresar</button>
 </div>
 
@@ -27,7 +21,7 @@
 
   <input id="nombre" placeholder="Nombre completo">
   <input id="area" placeholder="Área">
-  
+
   <select id="periodo">
     <option value="Primer periodo">Primer periodo</option>
     <option value="Segundo periodo">Segundo periodo</option>
@@ -40,6 +34,8 @@
     <input type="checkbox" id="empresa">
     Nivel empresa total
   </label>
+
+  <br>
 
   <button onclick="enviarSolicitud()">Enviar</button>
   <button onclick="logout()">Cerrar sesión</button>
