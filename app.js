@@ -5,11 +5,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { 
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged 
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 
-// 🔥 TU CONFIG (YA CORRECTA)
+// 🔥 CONFIG FIREBASE (TUYA)
 const firebaseConfig = {
   apiKey: "AIzaSyCrFSplvyoXZy_mgkVzG7e1VuPCPXM3gcs",
   authDomain: "vacaciones-app-7353a.firebaseapp.com",
@@ -20,12 +20,12 @@ const firebaseConfig = {
 };
 
 
-// 🔥 INICIALIZAR
+// 🔥 INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-console.log("🔥 Firebase conectado correctamente");
+console.log("🔥 Firebase conectado");
 
 
 // 🔐 LOGIN
@@ -37,14 +37,25 @@ window.login = async () => {
     await signInWithEmailAndPassword(auth, email, pass);
 
   } catch (error) {
-    console.error(error);
     alert(error.message);
   }
 };
 
 
-// 👤 DETECTAR USUARIO
+// 🔐 LOGOUT
+window.logout = async () => {
+  await signOut(auth);
+};
+
+
+// 👤 CONTROL DE SESIÓN
 onAuthStateChanged(auth, user => {
+
+  // RESET UI
+  document.getElementById("login").style.display = "block";
+  document.getElementById("formulario").style.display = "none";
+  document.getElementById("adminPanel").style.display = "none";
+
   if (user) {
     document.getElementById("login").style.display = "none";
 
@@ -74,7 +85,7 @@ window.enviarSolicitud = async () => {
 };
 
 
-// 📊 CARGAR ADMIN
+// 📊 ADMIN
 async function cargarAdmin(filtros = {}) {
   const cont = document.getElementById("solicitudes");
   cont.innerHTML = "";
