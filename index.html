@@ -18,7 +18,6 @@
 <!-- APP -->
 <div id="app" style="display:none;">
 
-  <!-- BOTÓN LOGOUT -->
   <button id="logoutBtn" onclick="logout()">Cerrar sesión</button>
 
   <h2 id="titulo"></h2>
@@ -28,6 +27,13 @@
     <input type="text" id="nombre" placeholder="Nombre">
     <input type="date" id="inicio">
     <input type="date" id="fin">
+
+    <!-- NUEVO -->
+    <select id="periodo">
+      <option value="Primer periodo">Primer periodo</option>
+      <option value="Segundo periodo">Segundo periodo</option>
+    </select>
+
     <input type="text" id="area" placeholder="Área">
 
     <button onclick="enviarSolicitud()">Enviar solicitud</button>
@@ -37,6 +43,13 @@
 
   <!-- ADMIN -->
   <div id="adminPanel" style="display:none;">
+
+    <!-- FILTRO POR FECHAS -->
+    <h3>Filtrar por fechas</h3>
+    <input type="date" id="filtroInicio">
+    <input type="date" id="filtroFin">
+    <button onclick="filtrarPorFecha()">Filtrar</button>
+
     <div id="solicitudes"></div>
   </div>
 
