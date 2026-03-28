@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>FASTHCK Vacaciones</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>FASTHCK Vacaciones</h1>
+
+<div id="login">
+  <input type="text" id="usuario" placeholder="Usuario">
+  <select id="rol">
+    <option value="empleado">Empleado</option>
+    <option value="admin">Administrador</option>
+  </select>
+  <button onclick="login()">Entrar</button>
+</div>
+
+<div id="app" style="display:none;">
+  <h2 id="titulo"></h2>
+
+  <div id="empleadoPanel">
+    <input type="text" id="nombre" placeholder="Nombre">
+    <input type="date" id="inicio">
+    <input type="date" id="fin">
+
+    <select id="periodo">
+      <option value="Primero">Primer periodo</option>
+      <option value="Segundo">Segundo periodo</option>
+    </select>
+
+    <input type="text" id="area" placeholder="Área">
+
+    <button onclick="enviarSolicitud()">Enviar</button>
+
+    <ul id="lista"></ul>
+  </div>
+
+  <div id="adminPanel" style="display:none;">
+    <div id="solicitudes"></div>
+  </div>
+
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
