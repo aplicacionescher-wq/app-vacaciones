@@ -1,3 +1,4 @@
+// 🔥 IMPORTS FIREBASE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
@@ -9,7 +10,7 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// TU CONFIG
+// 🔐 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyCrFSplvyoXZy_mgkVzG7e1VuPCPXM3gcs",
   authDomain: "vacaciones-app-7353a.firebaseapp.com",
@@ -19,11 +20,23 @@ const firebaseConfig = {
   appId: "1:829112426227:web:064a78429796e888d9a186"
 };
 
-// INICIALIZAR
+// 🚀 INICIALIZAR
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// VARIABLE GLOBAL
+let rolActual = "";
+
+// LOGIN
 window.login = () => {
+  const usuario = document.getElementById("usuario").value;
   rolActual = document.getElementById("rol").value;
+
+  if (!usuario) {
+    alert("Ingresa un usuario");
+    return;
+  }
+
   document.getElementById("login").style.display = "none";
   document.getElementById("app").style.display = "block";
 
@@ -34,6 +47,8 @@ window.login = () => {
     cargarAdmin();
   } else {
     document.getElementById("titulo").innerText = "Empleado";
+    document.getElementById("adminPanel").style.display = "none";
+    document.getElementById("empleadoPanel").style.display = "block";
     cargarSolicitudes();
   }
 };
@@ -45,6 +60,11 @@ window.enviarSolicitud = async () => {
   const fin = document.getElementById("fin").value;
   const periodo = document.getElementById("periodo").value;
   const area = document.getElementById("area").value;
+
+  if (!nombre || !inicio || !fin) {
+    alert("Completa todos los campos");
+    return;
+  }
 
   await addDoc(collection(db, "vacaciones"), {
     nombre,
@@ -59,11 +79,9 @@ window.enviarSolicitud = async () => {
   cargarSolicitudes();
 };
 
-// EMPLEADO VE ESTADO
+// EMPLEADO VE SUS SOLICITUDES
 async function cargarSolicitudes() {
   const lista = document.getElementById("lista");
-  if (!lista) return;
-
   lista.innerHTML = "";
 
   const data = await getDocs(collection(db, "vacaciones"));
@@ -77,8 +95,6 @@ async function cargarSolicitudes() {
 // ADMIN VE TODO
 async function cargarAdmin() {
   const cont = document.getElementById("solicitudes");
-  if (!cont) return;
-
   cont.innerHTML = "";
 
   const data = await getDocs(collection(db, "vacaciones"));
@@ -87,9 +103,10 @@ async function cargarAdmin() {
     const v = d.data();
 
     cont.innerHTML += `
-      <div>
-        <p>${v.nombre}</p>
+      <div style="border:1px solid white; margin:10px; padding:10px;">
+        <p><b>${v.nombre}</b></p>
         <p>${v.inicio} a ${v.fin}</p>
+        <p>${v.area}</p>
         <p>${v.estado}</p>
         <button onclick="autorizar('${d.id}')">Autorizar</button>
         <button onclick="cancelar('${d.id}')">Cancelar</button>
@@ -100,11 +117,15 @@ async function cargarAdmin() {
 
 // ACCIONES ADMIN
 window.autorizar = async (id) => {
-  await updateDoc(doc(db, "vacaciones", id), { estado: "aprobada" });
+  await updateDoc(doc(db, "vacaciones", id), {
+    estado: "aprobada"
+  });
   cargarAdmin();
 };
 
 window.cancelar = async (id) => {
-  await updateDoc(doc(db, "vacaciones", id), { estado: "cancelada" });
+  await updateDoc(doc(db, "vacaciones", id), {
+    estado: "cancelada"
+  });
   cargarAdmin();
 };
