@@ -1,170 +1,145 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  doc,
-  updateDoc,
-  query,
-  where
+import { 
+  getFirestore, collection, addDoc, getDocs, updateDoc, doc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
+import { 
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// CONFIG
+// CONFIG (REEMPLAZA CON LA TUYA)
 const firebaseConfig = {
-  apiKey: "AIzaSyCrFSplvyoXZy_mgkVzG7e1VuPCPXM3gcs",
-  authDomain: "vacaciones-app-7353a.firebaseapp.com",
-  projectId: "vacaciones-app-7353a",
-  storageBucket: "vacaciones-app-7353a.firebasestorage.app",
-  messagingSenderId: "829112426227",
-  appId: "1:829112426227:web:064a78429796e888d9a186"
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_DOMINIO",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_BUCKET",
+  messagingSenderId: "TU_ID",
+  appId: "TU_APP_ID"
 };
 
+// INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
 // LOGIN
 window.login = async () => {
-  const email = document.getElementById("usuario").value;
-  const pass = prompt("Contraseña");
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
 
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch (e) {
-    alert("Error login");
-  }
+  await signInWithEmailAndPassword(auth, email, pass);
 };
 
-// SESIÓN
-onAuthStateChanged(auth, (user) => {
-  if (user) iniciarApp(user);
-  else {
-    document.getElementById("app").style.display = "none";
-    document.getElementById("login").style.display = "block";
+// DETECTAR USUARIO
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById("login").style.display = "none";
+
+    // ADMIN
+    if (user.email === "admin@empresa.com") {
+      document.getElementById("adminPanel").style.display = "block";
+      cargarAdmin({ estado: "pendiente" });
+    } else {
+      document.getElementById("formulario").style.display = "block";
+    }
   }
 });
 
-// INICIAR
-function iniciarApp(user) {
-  document.getElementById("login").style.display = "none";
-  document.getElementById("app").style.display = "block";
-
-  const esAdmin = user.email === "admin@empresa.com";
-
-  if (esAdmin) {
-    document.getElementById("titulo").innerText = "Administrador";
-    document.getElementById("empleadoPanel").style.display = "none";
-    document.getElementById("adminPanel").style.display = "block";
-    cargarAdmin();
-  } else {
-    document.getElementById("titulo").innerText = "Empleado";
-    document.getElementById("adminPanel").style.display = "none";
-    document.getElementById("empleadoPanel").style.display = "block";
-    cargarSolicitudes(user.email);
-  }
-}
-
-// ENVIAR
+// ENVIAR SOLICITUD
 window.enviarSolicitud = async () => {
-  const user = auth.currentUser;
-
-  const nombre = document.getElementById("nombre").value;
-  const inicio = document.getElementById("inicio").value;
-  const fin = document.getElementById("fin").value;
-  const periodo = document.getElementById("periodo").value;
-  const area = document.getElementById("area").value;
-
-  await addDoc(collection(db, "vacaciones"), {
-    usuario: user.email,
-    nombre,
-    inicio,
-    fin,
-    periodo,
-    area,
+  const data = {
+    nombre: document.getElementById("nombre").value,
+    usuario: auth.currentUser.email,
+    inicio: document.getElementById("inicio").value,
+    fin: document.getElementById("fin").value,
+    periodo: document.getElementById("periodo").value,
+    area: document.getElementById("area").value,
     estado: "en proceso"
-  });
+  };
+
+  await addDoc(collection(db, "vacaciones"), data);
 
   alert("Solicitud enviada");
-  cargarSolicitudes(user.email);
 };
 
-// EMPLEADO
-async function cargarSolicitudes(email) {
-  const lista = document.getElementById("lista");
-  lista.innerHTML = "";
-
-  const q = query(collection(db, "vacaciones"), where("usuario", "==", email));
-  const data = await getDocs(q);
-
-  data.forEach(d => {
-    const v = d.data();
-    lista.innerHTML += `<li>${v.nombre} | ${v.periodo} | ${v.estado}</li>`;
-  });
-}
-
-// ADMIN
-async function cargarAdmin(filtro = null) {
+// CARGAR ADMIN
+async function cargarAdmin(filtros = {}) {
   const cont = document.getElementById("solicitudes");
   cont.innerHTML = "";
+
+  // HEADER
+  cont.innerHTML = `
+    <div class="fila header">
+      <div>Nombre</div>
+      <div>Correo</div>
+      <div>Inicio</div>
+      <div>Fin</div>
+      <div>Periodo</div>
+      <div>Estado</div>
+      <div>Acciones</div>
+    </div>
+  `;
 
   const data = await getDocs(collection(db, "vacaciones"));
 
   data.forEach(d => {
     const v = d.data();
 
-    // FILTRO
-    if (filtro) {
-      if (v.inicio < filtro.inicio || v.fin > filtro.fin) return;
+    // FILTRO ESTADO
+    if (filtros.estado && filtros.estado !== "todas") {
+      if (filtros.estado === "pendiente" && v.estado !== "en proceso") return;
+      if (filtros.estado === "aprobada" && v.estado !== "aprobada") return;
+      if (filtros.estado === "cancelada" && v.estado !== "cancelada") return;
     }
 
+    // FILTRO FECHAS
+    if (filtros.inicio && v.inicio < filtros.inicio) return;
+    if (filtros.fin && v.fin > filtros.fin) return;
+
+    const estadoClase =
+      v.estado === "en proceso" ? "pendiente" : v.estado;
+
     cont.innerHTML += `
-      <div class="card">
-        <p><b>${v.nombre}</b></p>
-        <p>${v.usuario}</p>
-        <p>${v.inicio} a ${v.fin}</p>
-        <p>${v.periodo}</p>
-        <p>${v.estado}</p>
-        <button onclick="autorizar('${d.id}')">Autorizar</button>
-        <button onclick="cancelar('${d.id}')">Cancelar</button>
+      <div class="fila">
+        <div>${v.nombre}</div>
+        <div>${v.usuario}</div>
+        <div>${v.inicio}</div>
+        <div>${v.fin}</div>
+        <div>${v.periodo}</div>
+        <div class="${estadoClase}">${v.estado}</div>
+        <div>
+          <button onclick="autorizar('${d.id}')">✔</button>
+          <button onclick="cancelar('${d.id}')">✖</button>
+        </div>
       </div>
     `;
   });
 }
 
-// FILTRAR
-window.filtrarPorFecha = () => {
+// FILTROS
+window.aplicarFiltros = () => {
   const inicio = document.getElementById("filtroInicio").value;
   const fin = document.getElementById("filtroFin").value;
+  const estado = document.getElementById("filtroEstado").value;
 
-  cargarAdmin({ inicio, fin });
+  cargarAdmin({
+    inicio,
+    fin,
+    estado
+  });
 };
 
-// ADMIN ACCIONES
+// APROBAR
 window.autorizar = async (id) => {
-  await updateDoc(doc(db, "vacaciones", id), { estado: "aprobada" });
+  await updateDoc(doc(db, "vacaciones", id), {
+    estado: "aprobada"
+  });
   cargarAdmin();
 };
 
+// CANCELAR
 window.cancelar = async (id) => {
-  await updateDoc(doc(db, "vacaciones", id), { estado: "cancelada" });
+  await updateDoc(doc(db, "vacaciones", id), {
+    estado: "cancelada"
+  });
   cargarAdmin();
-};
-
-// LOGOUT
-window.logout = async () => {
-  await signOut(auth);
-
-  document.getElementById("app").style.display = "none";
-  document.getElementById("login").style.display = "block";
-
-  alert("Sesión cerrada");
 };
