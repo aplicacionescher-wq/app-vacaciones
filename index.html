@@ -2,60 +2,72 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Vacaciones Empresa</title>
+  <title>App Vacaciones</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>Solicitud de Vacaciones</h1>
+<!-- LOGIN -->
+<div id="login">
+  <h2>Login</h2>
+  <input type="email" id="correo" placeholder="Correo">
+  <input type="password" id="password" placeholder="Contraseña">
 
-  <!-- LOGIN -->
-  <div id="login">
-    <input type="email" id="email" placeholder="Correo">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button onclick="login()">Ingresar</button>
-  </div>
+  <select id="rol">
+    <option value="empleado">Empleado</option>
+    <option value="admin">Administrador</option>
+  </select>
 
-  <!-- FORMULARIO USUARIO -->
-  <div id="formulario" style="display:none;">
-    <button onclick="logout()">Cerrar sesión</button>
+  <button onclick="login()">Ingresar</button>
+</div>
 
-    <input type="text" id="nombre" placeholder="Nombre completo">
-    <input type="date" id="inicio">
-    <input type="date" id="fin">
-    <input type="text" id="periodo" placeholder="Periodo (ej. 2025)">
-    <input type="text" id="area" placeholder="Área">
+<!-- EMPLEADO -->
+<div id="formulario" style="display:none;">
+  <h2>Solicitud de Vacaciones</h2>
 
-    <button onclick="enviarSolicitud()">Enviar solicitud</button>
-  </div>
+  <input id="nombre" placeholder="Nombre completo">
+  <input id="area" placeholder="Área">
+  
+  <select id="periodo">
+    <option value="Primer periodo">Primer periodo</option>
+    <option value="Segundo periodo">Segundo periodo</option>
+  </select>
 
-  <!-- ADMIN -->
-  <div id="adminPanel" style="display:none;">
+  <input type="date" id="inicio">
+  <input type="date" id="fin">
 
-    <h2>Panel Administrador</h2>
+  <label>
+    <input type="checkbox" id="empresa">
+    Nivel empresa total
+  </label>
 
-    <!-- 🔴 BOTÓN LOGOUT -->
-    <button onclick="logout()">Cerrar sesión</button>
+  <button onclick="enviarSolicitud()">Enviar</button>
+  <button onclick="logout()">Cerrar sesión</button>
 
-    <h3>Filtros</h3>
+  <h3>Mis solicitudes</h3>
+  <div id="misSolicitudes"></div>
+</div>
 
-    <input type="date" id="filtroInicio">
-    <input type="date" id="filtroFin">
+<!-- ADMIN -->
+<div id="adminPanel" style="display:none;">
+  <h2>Panel Administrador</h2>
 
-    <select id="filtroEstado">
-      <option value="pendiente">Pendientes</option>
-      <option value="todas">Todas</option>
-      <option value="aprobada">Aprobadas</option>
-      <option value="cancelada">Canceladas</option>
-    </select>
+  <input type="date" id="filtroInicio">
+  <input type="date" id="filtroFin">
 
-    <button onclick="aplicarFiltros()">Aplicar filtros</button>
+  <select id="filtroEstado">
+    <option value="todas">Todas</option>
+    <option value="en proceso">Pendientes</option>
+    <option value="aprobada">Aprobadas</option>
+    <option value="cancelada">Canceladas</option>
+  </select>
 
-    <div id="solicitudes"></div>
+  <button onclick="cargarSolicitudes()">Filtrar</button>
+  <button onclick="logout()">Cerrar sesión</button>
 
-  </div>
+  <div id="solicitudes"></div>
+</div>
 
-  <script type="module" src="app.js"></script>
-
+<script type="module" src="app.js"></script>
 </body>
 </html>
