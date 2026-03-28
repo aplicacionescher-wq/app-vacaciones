@@ -1,58 +1,29 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: white;
-  padding: 20px;
+/* FILAS EMPLEADO (mis solicitudes) */
+#misSolicitudes .fila {
+  grid-template-columns: 1fr 1fr 1fr 1fr 2fr;
 }
 
-input, button, select {
-  display: block;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
+/* Inputs tipo fecha */
+input[type="date"] {
+  background: white;
+  color: black;
 }
 
-button {
-  background: #22c55e;
-  color: white;
-  cursor: pointer;
+/* Select */
+select {
+  background: white;
+  color: black;
 }
 
-button:hover {
-  background: #16a34a;
+/* Checkbox */
+input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-left: 10px;
 }
 
-#solicitudes {
-  width: 100%;
-  margin-top: 20px;
-}
-
-/* TABLA LINEAL */
-.fila {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr auto;
-  gap: 10px;
-  padding: 10px;
-  border-bottom: 1px solid #334155;
-  align-items: center;
-}
-
-/* HEADER */
-.header {
-  font-weight: bold;
-  background: #1e293b;
-}
-
-/* ESTADOS */
-.pendiente {
-  color: yellow;
-}
-
-.aprobada {
-  color: #22c55e;
-}
-
-.cancelada {
-  color: red;
+/* Responsive */
+@media (max-width: 768px) {
+  .fila {
+    grid-template-columns: 1fr;
+  }
 }
