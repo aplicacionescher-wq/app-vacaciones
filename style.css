@@ -26,3 +26,7 @@ border-radius:15px;
 .aprobada{color:#22c55e;}
 .cancelada{color:#ef4444;}
 .proceso{color:#facc15;}
+
+input {
+  width: 200px;
+}
