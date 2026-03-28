@@ -1,32 +1,48 @@
-body{
-font-family:Arial;
-background:#020617;
-color:white;
-text-align:center;
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  text-align: center;
 }
-input,select,button{
-margin:10px;
-padding:10px;
-border-radius:10px;
+
+h1 {
+  color: #22c55e;
 }
-button{
-background:#00f5d4;
-border:none;
-cursor:pointer;
+
+input, button {
+  margin: 5px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
 }
-button:hover{
-background:#06d6a0;
-}
-.card{
-background:#111827;
-margin:10px;
-padding:10px;
-border-radius:15px;
-}
-.aprobada{color:#22c55e;}
-.cancelada{color:#ef4444;}
-.proceso{color:#facc15;}
 
 input {
-  width: 200px;
+  width: 220px;
+}
+
+button {
+  background: #22c55e;
+  color: black;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #16a34a;
+}
+
+#logoutBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+#empleadoPanel, #adminPanel {
+  margin-top: 20px;
+}
+
+.card {
+  border: 1px solid white;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
 }
