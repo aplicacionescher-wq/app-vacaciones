@@ -9,16 +9,18 @@
 
 <h1>FASTHCK Vacaciones</h1>
 
+<!-- LOGIN -->
 <div id="login">
-  <input type="text" id="usuario" placeholder="Usuario">
-  <select id="rol">
-    <option value="empleado">Empleado</option>
-    <option value="admin">Administrador</option>
-  </select>
+  <input type="email" id="usuario" placeholder="Correo">
   <button onclick="login()">Entrar</button>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
+
+  <!-- BOTÓN LOGOUT -->
+  <button id="logoutBtn" onclick="logout()">Cerrar sesión</button>
+
   <h2 id="titulo"></h2>
 
   <!-- EMPLEADO -->
@@ -26,15 +28,9 @@
     <input type="text" id="nombre" placeholder="Nombre">
     <input type="date" id="inicio">
     <input type="date" id="fin">
-
-    <select id="periodo">
-      <option value="Primero">Primer periodo</option>
-      <option value="Segundo">Segundo periodo</option>
-    </select>
-
     <input type="text" id="area" placeholder="Área">
 
-    <button onclick="enviarSolicitud()">Enviar</button>
+    <button onclick="enviarSolicitud()">Enviar solicitud</button>
 
     <ul id="lista"></ul>
   </div>
