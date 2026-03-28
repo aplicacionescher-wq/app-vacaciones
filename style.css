@@ -46,3 +46,13 @@ button:hover {
   padding: 10px;
   border-radius: 10px;
 }
+select {
+  margin: 5px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+h3 {
+  margin-top: 20px;
+  color: #38bdf8;
+}
