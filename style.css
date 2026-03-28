@@ -1,28 +1,21 @@
 body {
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   background: #0f172a;
   color: white;
-  text-align: center;
+  padding: 20px;
 }
 
-h1 {
-  color: #22c55e;
-}
-
-input, button {
-  margin: 5px;
+input, button, select {
+  display: block;
+  margin: 10px 0;
   padding: 10px;
   border-radius: 8px;
   border: none;
 }
 
-input {
-  width: 220px;
-}
-
 button {
   background: #22c55e;
-  color: black;
+  color: white;
   cursor: pointer;
 }
 
@@ -30,29 +23,37 @@ button:hover {
   background: #16a34a;
 }
 
-#logoutBtn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-#empleadoPanel, #adminPanel {
+/* CONTENEDOR */
+#solicitudes {
+  width: 100%;
   margin-top: 20px;
 }
 
-.card {
-  border: 1px solid white;
-  margin: 10px;
+/* FILA */
+.fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr auto;
+  gap: 10px;
   padding: 10px;
-  border-radius: 10px;
-}
-select {
-  margin: 5px;
-  padding: 10px;
-  border-radius: 8px;
+  border-bottom: 1px solid #334155;
+  align-items: center;
 }
 
-h3 {
-  margin-top: 20px;
-  color: #38bdf8;
+/* HEADER */
+.header {
+  font-weight: bold;
+  background: #1e293b;
+}
+
+/* ESTADOS */
+.pendiente {
+  color: yellow;
+}
+
+.aprobada {
+  color: #22c55e;
+}
+
+.cancelada {
+  color: red;
 }
