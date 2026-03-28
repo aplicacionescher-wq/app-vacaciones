@@ -23,13 +23,12 @@ button:hover {
   background: #16a34a;
 }
 
-/* CONTENEDOR */
 #solicitudes {
   width: 100%;
   margin-top: 20px;
 }
 
-/* FILA */
+/* TABLA LINEAL */
 .fila {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr auto;
